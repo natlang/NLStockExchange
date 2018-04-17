@@ -1,0 +1,22 @@
+#trials
+1
+#agents
+ZIP 11
+#network
+FC
+#order_interval
+30
+#days
+10
+#order_timemode
+periodic
+#demand_schedule_1
+0
+10
+[75, 325]
+fixed
+#supply_schedule_1
+0
+10
+[75, 325]
+fixed

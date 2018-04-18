@@ -172,7 +172,7 @@ def customer_orders(time, traders, n_traders, order_sched, pending, verbose):
     return new_pending
 
 
-def process_order(order, time, traders, n_traders, buy_network, sell_network, verbose):
+def process_order(order, time, traders, buy_network, sell_network, verbose):
     # Form a list of agents willing to deal
     def get_willing(price, traders, neighbors, char):
         willing_list = []
@@ -187,7 +187,6 @@ def process_order(order, time, traders, n_traders, buy_network, sell_network, ve
         neighbors = list(sell_network.neighbors(nodeid))
         willing = get_willing(order.price, traders, neighbors, 'S%02d')
     elif order.otype == 'Ask':
-        nodeid = nodeid - n_traders
         neighbors = list(buy_network.neighbors(nodeid))
         willing = get_willing(order.price, traders, neighbors, 'B%02d')
     else:
@@ -212,10 +211,8 @@ def process_order(order, time, traders, n_traders, buy_network, sell_network, ve
     return transaction_record
 
 
-def update_traders(order, traders, n_traders, buy_network, sell_network, verbose):
+def update_traders(order, traders, buy_network, sell_network, verbose):
     nodeid = traders[order.tid].nodeid
-    if order.otype == 'Ask':
-        nodeid = nodeid - n_traders
 
     buyers = list(buy_network.neighbors(nodeid))
     buyers.append(nodeid)
@@ -255,13 +252,13 @@ def run(trial_id, start_time, end_time, order_sched, traders, n_traders, buy_net
         tid = random.choice(list(traders.keys()))
         order = traders[tid].get_order(time)
         if order is not None:
-            trade = process_order(order, time, traders, n_traders, buy_network, sell_network, trade_verbose)
+            trade = process_order(order, time, traders, buy_network, sell_network, trade_verbose)
             if trade is not None:
                 traders[trade['party1']].bookkeep(trade, bookkeep_verbose)
                 traders[trade['party2']].bookkeep(trade, bookkeep_verbose)
                 trade_price = trade['price']
 
-            update_traders(order, traders, n_traders, buy_network, sell_network, update_verbose)
+            update_traders(order, traders, buy_network, sell_network, update_verbose)
 
         ddat.update_ddat(trial_id, time, eq, trade_price)
         tdat = data.update_tdat(tdat, trial_id, time, eq, trade_price)

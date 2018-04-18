@@ -29,22 +29,23 @@ if __name__ == '__main__':
     ddat_df = pd.DataFrame()
     tdat_df = pd.DataFrame()
 
+    # Initialise network
+    logger.info('Creating network')
+    (n_traders, buy_network, sell_network) = setup.build_network(params['traders_spec'], params['network_type'])
+    nx.write_adjlist(buy_network, 'network.txt')
+    zip_file.write('network.txt')
+    os.remove('network.txt')
+
     # Run sequence of trials, 1 session per trial
-    init_verbose = False
     trial = 1
     logger.info('Running NLSE experiments')
     while trial < params['n_trials'] + 1:
         trial_id = 'trial%04d' % trial
+        logger.info('Running %s' % trial_id)
         # Initialise traders
         traders = {}
-        (n_traders, buy_network, sell_network) = setup.populate_market(params['traders_spec'],
-                                                                       traders,
-                                                                       params['network_type'],
-                                                                       init_verbose)
-        logger.info('Writing network adjacency matrix...')
-        nx.write_adjlist(buy_network, 'network.txt')
-        zip_file.write('network.txt')
-        os.remove('network.txt')
+        init_verbose = False
+        setup.populate_market(params['traders_spec'], traders, buy_network, sell_network, init_verbose)
         ddat, tdat = session.run(trial_id, params['start'],
                                  params['end'], params['order_sched'],
                                  traders, n_traders,

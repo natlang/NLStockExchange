@@ -1,7 +1,17 @@
 import pandas as pd
 import numpy as np
-from collections import defaultdict
+import networkx as nx
 
+
+####################- Network Data -####################
+
+
+def write_network(G, filename):
+    nx.write_adjlist(G, filename + '_network.txt')
+
+
+####################- End of Network Data -####################
+####################- Trading Data -####################
 
 # Find equilibrium price (theoretical + actual) from trader limits and prices
 def find_eq(traders, n_traders):
@@ -102,6 +112,9 @@ def init_ddat(interval):
     return ddat
 
 
+####################- End of Trading Data -####################
+####################- Day Data -####################
+
 class DayData:
     def __init__(self, df, interval):
         self.df = df
@@ -137,6 +150,7 @@ class DayData:
             if arr is not None:
                 mean = np.mean(arr)
             return mean
+
         # Write previous days data to structure containing data for *all* days in trial
         ddat = {'trialID': trial,
                 'day': self.current_day,
@@ -156,4 +170,4 @@ class DayData:
     def get_df(self):
         return self.df
 
-
+    ####################- End of Day Data -####################

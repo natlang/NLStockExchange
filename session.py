@@ -3,7 +3,6 @@ import random
 import numpy as np
 
 import config
-import setup
 import data
 from order import Order
 
@@ -231,8 +230,7 @@ def update_traders(order, traders, n_traders, buy_network, sell_network, verbose
         traders[sname].update(order.price, order.otype, order.status, verbose)
 
 
-def run(trial_id, start_time, end_time, traders_spec, network_type, order_sched):
-    init_verbose = False
+def run(trial_id, start_time, end_time, order_sched, traders, n_traders, buy_network, sell_network):
     orders_verbose = False
     trade_verbose = False
     update_verbose = False
@@ -241,10 +239,6 @@ def run(trial_id, start_time, end_time, traders_spec, network_type, order_sched)
     # Initialise trading data + day data
     tdat = data.init_tdat()
     ddat = data.init_ddat(order_sched['interval'])
-
-    # Initialise traders
-    traders = {}
-    (n_traders, buy_network, sell_network) = setup.populate_market(traders_spec, traders, network_type, init_verbose)
 
     timestep = 1.0 / float(n_traders * 2)  # TODO: need to check this
     time = start_time

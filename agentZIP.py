@@ -1,5 +1,6 @@
 import random
 import sys
+import numpy as np
 
 from order import Order
 
@@ -16,6 +17,7 @@ class AgentZIP:
         self.limit = None
         self.price = None
         self.balance = 0.0  # called bank in Cliff '97
+        self.price_hist = []
         # Specific to ZIP
         # self.deals_done = 0
         self.margin = margin  # called profit in Cliff '97
@@ -57,6 +59,15 @@ class AgentZIP:
         self.price = quoteprice
         return quoteprice
 
+    # Add price to price history array
+    def update_price_hist(self):
+        if self.price is not None:
+            self.price_hist.append(self.price)
+
+    # At end of each day, reset price_hist
+    def reset_price_hist(self):
+        self.price_hist = []
+
     # Is a trader willing to trade at a given price?
     def willing_to_trade(self, oprice):
         willing = False
@@ -86,7 +97,7 @@ class AgentZIP:
     # Update buyer/seller strategy after a order
     def update(self, oprice, otype, status, verbose):
         # Update profit margin based on sale price using Widrow-Hoff style update rule with learning rate beta
-        def profit_alter(target, verbose):
+        def profit_alter(target, profit_verbose):
             diff = target - self.price
             change = ((1.0 - self.momentum) * (self.beta * diff)) + (self.momentum * self.prev_change)
 
@@ -108,7 +119,7 @@ class AgentZIP:
             old_price = self.price
             new_price = self.set_price()
 
-            if new_price != old_price and verbose:
+            if new_price != old_price and profit_verbose:
                 print('TID %s limit = %s : old margin = %s - new margin = %s, old price = %s - new price = %s' % (self.tid, self.limit, old_margin, new_margin, old_price, new_price))
 
         def target_up(price):
@@ -125,23 +136,22 @@ class AgentZIP:
             target = int(round(ptrb_rel - ptrb_abs, 0))
             return target
 
-        profit_verbose = verbose
         if self.job == 'Sell':
             if status == 'Deal':
                 # Could sell for more? increase price (increase margin)
                 if self.price <= oprice:
                     target_price = target_up(oprice)
-                    profit_alter(target_price, profit_verbose)
+                    profit_alter(target_price, verbose)
                 # Wouldn't have got deal, reduce price (reduce margin)
                 else:
                     if otype == 'Bid' and self.active:
                         target_price = target_down(oprice)
-                        profit_alter(target_price, profit_verbose)
+                        profit_alter(target_price, verbose)
             elif status == 'NoDeal':
                 # Would've asked for more and lost deal, reduce price (reduce margin)
                 if otype == 'Ask' and self.price >= oprice and self.active:
                     target_price = target_down(oprice)
-                    profit_alter(target_price, profit_verbose)
+                    profit_alter(target_price, verbose)
             else:
                 sys.exit('FATAL: status is neither Deal or NoDeal in Agent.update()\n')
 
@@ -150,16 +160,16 @@ class AgentZIP:
                 # Could buy for less? reduce price (increase margin)
                 if self.price >= oprice:
                     target_price = target_down(oprice)
-                    profit_alter(target_price, profit_verbose)
+                    profit_alter(target_price, verbose)
                 # Wouldn't have got deal, increase price (reduce margin)
                 else:
                     if otype == 'Ask' and self.active:
                         target_price = target_up(oprice)
-                        profit_alter(target_price, profit_verbose)
+                        profit_alter(target_price, verbose)
             elif status == 'NoDeal':
                 # Would've bid less and lost deal, increase price (reduce margin)
                 if otype == 'Bid' and self.price <= oprice and self.active:
                     target_price = target_up(oprice)
-                    profit_alter(target_price, profit_verbose)
+                    profit_alter(target_price, verbose)
             else:
                 sys.exit('FATAL: status is neither Deal or NoDeal in Agent.update()\n')

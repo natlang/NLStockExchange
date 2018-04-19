@@ -211,19 +211,18 @@ def process_order(order, time, traders, buy_network, sell_network, verbose):
     return transaction_record
 
 
-def update_traders(order, traders, buy_network, sell_network, verbose):
+def update_traders(order, traders, n_traders, buy_network, sell_network, verbose):
     nodeid = traders[order.tid].nodeid
+    neighbors = set()
 
-    buyers = list(buy_network.neighbors(nodeid))
-    buyers.append(nodeid)
-    for b in buyers:
-        bname = 'B%02d' % b
+    neighbors.update(buy_network.neighbors(nodeid))
+    neighbors.update(sell_network.neighbors(nodeid))
+    neighbors.add(nodeid)
+
+    for n in range(n_traders):
+        bname = 'B%02d' % n
+        sname = 'S%02d' % n
         traders[bname].update(order.price, order.otype, order.status, verbose)
-
-    sellers = list(sell_network.neighbors(nodeid))
-    sellers.append(nodeid)
-    for s in sellers:
-        sname = 'S%02d' % s
         traders[sname].update(order.price, order.otype, order.status, verbose)
 
 
@@ -235,7 +234,7 @@ def run(trial_id, start_time, end_time, order_sched, traders, n_traders, buy_net
 
     # Initialise trading data + day data
     tdat = data.init_tdat()
-    ddat = data.init_ddat(order_sched['interval'])
+    ddat = data.init_ddat(order_sched['interval'], buy_network, sell_network)
 
     timestep = 1.0 / float(n_traders * 2)  # TODO: need to check this
     time = start_time
@@ -258,13 +257,13 @@ def run(trial_id, start_time, end_time, order_sched, traders, n_traders, buy_net
                 traders[trade['party2']].bookkeep(trade, bookkeep_verbose)
                 trade_price = trade['price']
 
-            update_traders(order, traders, buy_network, sell_network, update_verbose)
+            update_traders(order, traders, n_traders, buy_network, sell_network, update_verbose)
 
-        ddat.update_ddat(trial_id, time, eq, trade_price)
+        ddat.update_ddat(trial_id, time, traders, n_traders, eq, trade_price)
         tdat = data.update_tdat(tdat, trial_id, time, eq, trade_price)
         time += timestep
 
-    ddat.update_ddat(trial_id, time, eq, trade_price)
+    ddat.update_ddat(trial_id, time, traders, n_traders, eq, trade_price)
     # tdat = data.update_tdat(tdat, trial_id, time, eq, trade_price)
     ddat_df = ddat.get_df()
     return ddat_df, tdat

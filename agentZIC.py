@@ -1,4 +1,5 @@
 import random
+import numpy as np
 
 import config
 from order import Order
@@ -16,6 +17,7 @@ class AgentZIC:
         self.limit = None
         self.price = None
         self.balance = 0.0
+        self.price_hist = None
 
     def __str__(self):
         return '[TID %s type %s nodeid %s limit %s]' \

@@ -5,10 +5,11 @@ def get_params(filename):
     n_trials = 0
     traders_spec = []
     network_type = None
-    interval = None
+    days = None
     order_schedule = {}
     demand_schedule = []
     supply_schedule = []
+    interval = None
     start_time = 0.0
     end_time = None
 
@@ -38,8 +39,7 @@ def get_params(filename):
                 order_schedule['interval'] = interval
             elif line.startswith('#days'):
                 days = int(lines[i + 1])
-                order_schedule['n_days'] = days
-                end_time = (days + 1) * interval
+                end_time = days * interval
             elif line.startswith('#order_timemode'):
                 order_schedule['timemode'] = lines[i + 1].strip('\n')
             elif line.startswith('#demand_schedule'):
@@ -58,6 +58,7 @@ def get_params(filename):
 
     params = {'n_trials': n_trials,
               'network_type': network_type,
+              'n_days': days,
               'start': start_time,
               'end': end_time,
               'traders_spec': traders_spec,

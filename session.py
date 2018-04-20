@@ -110,13 +110,13 @@ def customer_orders(time, traders, n_traders, order_sched, pending, verbose):
             price = min_price + int(trader * step)
         elif s_mode == 'jittered':
             price = min_price + int(trader * step) + random.randint(-half_step, half_step)
-        # elif s_mode == 'random':
-        #     # More than one schedule, choose one equiprobably
-        #     if len(s_range) > 1:
-        #         s = random.randint(0, len(s_range) - 1)
-        #         min_price = sysmin_check(min(s_range[s][0], s_range[s][1]))
-        #         max_price = sysmax_check(max(s_range[s][0], s_range[s][1]))
-        #     price = random.randint(min_price, max_price)
+        elif s_mode == 'random':
+            # # More than one schedule, choose one equiprobably
+            # if len(s_range) > 1:
+            #     s = random.randint(0, len(s_range) - 1)
+            #     min_price = sysmin_check(min(s_range[s][0], s_range[s][1]))
+            #     max_price = sysmax_check(max(s_range[s][0], s_range[s][1]))
+            price = random.randint(min_price, max_price)
         else:
             sys.exit('FATAL: Unknown mode in schedule in get_order_price()')
         price = sysmin_check(sysmax_check(price))
@@ -226,7 +226,7 @@ def update_traders(order, traders, n_traders, buy_network, sell_network, verbose
         traders[sname].update(order.price, order.otype, order.status, verbose)
 
 
-def run(trial_id, start_time, end_time, order_sched, traders, n_traders, buy_network, sell_network):
+def run(trial, start_time, end_time, order_sched, traders, n_traders, ndat, buy_network, sell_network):
     orders_verbose = False
     trade_verbose = False
     update_verbose = False
@@ -234,7 +234,7 @@ def run(trial_id, start_time, end_time, order_sched, traders, n_traders, buy_net
 
     # Initialise trading data + day data
     tdat = data.init_tdat()
-    ddat = data.init_ddat(order_sched['interval'], buy_network, sell_network)
+    ddat = data.init_ddat(order_sched['interval'])
 
     timestep = 1.0 / float(n_traders * 2)  # TODO: need to check this
     time = start_time
@@ -259,11 +259,11 @@ def run(trial_id, start_time, end_time, order_sched, traders, n_traders, buy_net
 
             update_traders(order, traders, n_traders, buy_network, sell_network, update_verbose)
 
-        ddat.update_ddat(trial_id, time, traders, n_traders, eq, trade_price)
-        tdat = data.update_tdat(tdat, trial_id, time, eq, trade_price)
+        ddat.update_ddat(trial, time, traders, n_traders, eq, trade_price, ndat)
+        tdat = data.update_tdat(tdat, trial, time, eq, trade_price)
         time += timestep
 
-    ddat.update_ddat(trial_id, time, traders, n_traders, eq, trade_price)
+    ddat.update_ddat(trial, time, traders, n_traders, eq, trade_price, ndat)
     # tdat = data.update_tdat(tdat, trial_id, time, eq, trade_price)
     ddat_df = ddat.get_df()
     return ddat_df, tdat

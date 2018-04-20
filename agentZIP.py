@@ -19,7 +19,6 @@ class AgentZIP:
         self.balance = 0.0  # called bank in Cliff '97
         self.price_hist = []
         # Specific to ZIP
-        # self.deals_done = 0
         self.margin = margin  # called profit in Cliff '97
         self.beta = 0.1 * random.randrange(1, 6)
         self.momentum = 0.1 * random.random()
@@ -59,7 +58,7 @@ class AgentZIP:
         self.price = quoteprice
         return quoteprice
 
-    # Add price to price history array
+    # Add price to price_hist
     def update_price_hist(self):
         if self.price is not None:
             self.price_hist.append(self.price)
@@ -136,40 +135,41 @@ class AgentZIP:
             target = int(round(ptrb_rel - ptrb_abs, 0))
             return target
 
-        if self.job == 'Sell':
-            if status == 'Deal':
-                # Could sell for more? increase price (increase margin)
-                if self.price <= oprice:
-                    target_price = target_up(oprice)
-                    profit_alter(target_price, verbose)
-                # Wouldn't have got deal, reduce price (reduce margin)
-                else:
-                    if otype == 'Bid' and self.active:
-                        target_price = target_down(oprice)
-                        profit_alter(target_price, verbose)
-            elif status == 'NoDeal':
-                # Would've asked for more and lost deal, reduce price (reduce margin)
-                if otype == 'Ask' and self.price >= oprice and self.active:
-                    target_price = target_down(oprice)
-                    profit_alter(target_price, verbose)
-            else:
-                sys.exit('FATAL: status is neither Deal or NoDeal in Agent.update()\n')
-
-        else:  # self.job == 'Buy'
-            if status == 'Deal':
-                # Could buy for less? reduce price (increase margin)
-                if self.price >= oprice:
-                    target_price = target_down(oprice)
-                    profit_alter(target_price, verbose)
-                # Wouldn't have got deal, increase price (reduce margin)
-                else:
-                    if otype == 'Ask' and self.active:
+        if self.price is not None:
+            if self.job == 'Sell':
+                if status == 'Deal':
+                    # Could sell for more? increase price (increase margin)
+                    if self.price <= oprice:
                         target_price = target_up(oprice)
                         profit_alter(target_price, verbose)
-            elif status == 'NoDeal':
-                # Would've bid less and lost deal, increase price (reduce margin)
-                if otype == 'Bid' and self.price <= oprice and self.active:
-                    target_price = target_up(oprice)
-                    profit_alter(target_price, verbose)
-            else:
-                sys.exit('FATAL: status is neither Deal or NoDeal in Agent.update()\n')
+                    # Wouldn't have got deal, reduce price (reduce margin)
+                    else:
+                        if otype == 'Bid' and self.active:
+                            target_price = target_down(oprice)
+                            profit_alter(target_price, verbose)
+                elif status == 'NoDeal':
+                    # Would've asked for more and lost deal, reduce price (reduce margin)
+                    if otype == 'Ask' and self.price >= oprice and self.active:
+                        target_price = target_down(oprice)
+                        profit_alter(target_price, verbose)
+                else:
+                    sys.exit('FATAL: status is neither Deal or NoDeal in Agent.update()\n')
+
+            else:  # self.job == 'Buy'
+                if status == 'Deal':
+                    # Could buy for less? reduce price (increase margin)
+                    if self.price >= oprice:
+                        target_price = target_down(oprice)
+                        profit_alter(target_price, verbose)
+                    # Wouldn't have got deal, increase price (reduce margin)
+                    else:
+                        if otype == 'Ask' and self.active:
+                            target_price = target_up(oprice)
+                            profit_alter(target_price, verbose)
+                elif status == 'NoDeal':
+                    # Would've bid less and lost deal, increase price (reduce margin)
+                    if otype == 'Bid' and self.price <= oprice and self.active:
+                        target_price = target_up(oprice)
+                        profit_alter(target_price, verbose)
+                else:
+                    sys.exit('FATAL: status is neither Deal or NoDeal in Agent.update()\n')

@@ -264,6 +264,5 @@ def run(trial, start_time, end_time, order_sched, traders, n_traders, ndat, buy_
         time += timestep
 
     ddat.update_ddat(trial, time, traders, n_traders, eq, trade_price, ndat)
-    # tdat = data.update_tdat(tdat, trial_id, time, eq, trade_price)
     ddat_df = ddat.get_df()
     return ddat_df, tdat

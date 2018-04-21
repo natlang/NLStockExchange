@@ -169,12 +169,12 @@ class DayData:
         aeq = calc_mean(self.aeq_p)
         for n in range(n_traders):
             bname = 'B%02d' % n
-            alpha = calc_alpha(aeq, traders[bname].price_hist)
+            alpha = calc_alpha(teq, traders[bname].price_hist)
             update_ndat(ndat, bname, trial, self.current_day, alpha)
             traders[bname].reset_price_hist()
 
             sname = 'S%02d' % n
-            alpha = calc_alpha(aeq, traders[sname].price_hist)
+            alpha = calc_alpha(teq, traders[sname].price_hist)
             update_ndat(ndat, sname, trial, self.current_day, alpha)
             traders[sname].reset_price_hist()
 
@@ -262,7 +262,6 @@ def draw_network(ndat, n_days, buy_network, sell_network, zipfile):
 
         draw_graph(buy_network, n, 'B', zipfile)
         draw_graph(sell_network, n, 'S', zipfile)
-
 
 
 # Write network data adjaceny matrix

@@ -239,9 +239,10 @@ def draw_network(ndat, n_days, buy_network, sell_network, zipfile):
         for k, v in pos.items():
             pos_higher[k] = (v[0], v[1] + 0.1)
         nx.draw_networkx_edges(graph, pos, alpha=0.2)
-        network = nx.draw_networkx_nodes(graph, pos, node_color=colors, cmap=plt.cm.gist_rainbow, vmin=0.0, vmax=0.75)
-        nx.draw_networkx_labels(graph, pos_higher, labels=labels)
-        plt.colorbar(network)
+        network = nx.draw_networkx_nodes(graph, pos, node_color=colors, cmap=plt.cm.RdYlGn_r, vmin=0.0, vmax=0.75)
+        nx.draw_networkx_labels(graph, pos_higher, labels=labels, font_size=14)
+        cbar = plt.colorbar(network)
+        cbar.ax.tick_params(labelsize=14)
         plt.axis('off')
         filename = char + 'network' + str(d) + '.png'
         plt.savefig(filename, dpi=300)

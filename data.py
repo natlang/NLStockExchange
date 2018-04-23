@@ -229,16 +229,16 @@ def draw_network(ndat, n_days, buy_network, sell_network, zipfile):
             a = graph.node[node]['alpha']
             labels[node] = [t, a]
 
-        plt.figure(figsize=(18.75, 15))
-        pos = nx.circular_layout(graph)
+        # plt.figure(figsize=(12,8))
+        pos = nx.circular_layout(graph, center=(0, 0))
         pos_higher = {}
         for k, v in pos.items():
-            pos_higher[k] = (v[0], v[1] + 0.1)
+            pos_higher[k] = (v[0], v[1] + 0.15)
         nx.draw_networkx_edges(graph, pos, alpha=0.2)
-        network = nx.draw_networkx_nodes(graph, pos, node_color=colors, node_size=300, cmap=plt.cm.RdYlGn_r, vmin=0.0, vmax=0.75)
+        network = nx.draw_networkx_nodes(graph, pos, node_color=colors, cmap=plt.cm.RdYlGn_r, vmin=0.0, vmax=0.75)
         nx.draw_networkx_labels(graph, pos_higher, labels=labels, font_size=14)
         cbar = plt.colorbar(network)
-        cbar.ax.tick_params(labelsize=14)
+        cbar.ax.tick_params(labelsize=16)
         plt.axis('off')
         filename = char + 'network' + str(d) + '.png'
         plt.savefig(filename, dpi=300)

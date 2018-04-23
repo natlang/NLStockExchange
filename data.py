@@ -32,21 +32,21 @@ def find_eq(traders, n_traders):
                     if not found:
                         # straightforward intersection
                         if sp[q] > bp[q]:
-                            price = (sp[q - 1] + bp[q - 1]) / 2.0
+                            price = (sp[q - 1] + bp[q - 1]) * 0.5
                             quant = q
                             found = True
                         else:
                             # last buyer, last seller
                             if (q + 1 == bnum) and (q + 1 == snum):
-                                price = (sp[q] + bp[q]) / 2.0
+                                price = (sp[q] + bp[q]) * 0.5
                                 quant = q + 1
                                 found = True
                             elif q + 1 == bnum:
-                                price = (sp[q] + sp[q + 1]) / 2.0
+                                price = (sp[q] + sp[q + 1]) * 0.5
                                 quant = q + 1
                                 found = True
                             elif q + 1 == snum:
-                                price = (bp[q] + bp[q + 1]) / 2.0
+                                price = (bp[q] + bp[q + 1]) * 0.5
                                 quant = q + 1
                                 found = True
 
@@ -158,7 +158,7 @@ class DayData:
         def calc_alpha(eq, arr):
             if arr:
                 num = len(arr)
-                sum_sqrd = sum(map(lambda x: (eq - x) ** 2, arr))
+                sum_sqrd = sum(map(lambda x: (x - eq) ** 2, arr))
                 a = (1.0 / eq) * math.sqrt((1.0 / num) * sum_sqrd)
             else:
                 a = 1.0  # TODO: change this to a more reasonable value
@@ -237,14 +237,14 @@ def draw_network(ndat, n_days, buy_network, sell_network, zipfile):
         pos = nx.circular_layout(graph)
         pos_higher = {}
         for k, v in pos.items():
-            pos_higher[k] = (v[0], v[1] + 0.15)
+            pos_higher[k] = (v[0], v[1] + 0.1)
         nx.draw_networkx_edges(graph, pos, alpha=0.2)
-        network = nx.draw_networkx_nodes(graph, pos, node_color=colors, cmap=plt.cm.gist_rainbow, vmin=0.0, vmax=1.0)
+        network = nx.draw_networkx_nodes(graph, pos, node_color=colors, cmap=plt.cm.gist_rainbow, vmin=0.0, vmax=0.75)
         nx.draw_networkx_labels(graph, pos_higher, labels=labels)
         plt.colorbar(network)
         plt.axis('off')
         filename = char + 'network' + str(d) + '.png'
-        plt.savefig(filename, dpi=100)  # TODO: change these
+        plt.savefig(filename, dpi=300)
         zip_file.write(filename)
         os.remove(filename)
         plt.clf()

@@ -12,15 +12,15 @@ import session
 import expctl
 import data
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger(__name__)
 
 if __name__ == '__main__':
     input_file = sys.argv[1]
     filename, file_ext = os.path.splitext(os.path.basename(input_file))
-    strtime = str(strftime('%d-%b_%H:%M', gmtime()))
+    # strtime = str(strftime('%d-%b_%H:%M', gmtime()))
 
-    zip_name = filename + strtime + '.zip'
+    zip_name = filename + '.zip'
     zip_file = zipfile.ZipFile(zip_name, 'w')
 
     # Set up parameters for the session

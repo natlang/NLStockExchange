@@ -227,18 +227,18 @@ def draw_network(ndat, n_days, buy_network, sell_network, zipfile):
         for node in graph.nodes:
             t = graph.node[node]['tname']
             a = graph.node[node]['alpha']
-            labels[node] = [t, a]
+            labels[node] = t + '\n' + str(a)
 
-        plt.figure(figsize=(24,18))
+        plt.figure(figsize=(12,9))
         pos = nx.circular_layout(graph, center=(0, 0))
         pos_higher = {}
         for k, v in pos.items():
             pos_higher[k] = (v[0], v[1] + 0.15)
         nx.draw_networkx_edges(graph, pos, alpha=0.2)
         network = nx.draw_networkx_nodes(graph, pos, node_color=colors, cmap=plt.cm.RdYlGn_r, vmin=0.0, vmax=0.75)
-        nx.draw_networkx_labels(graph, pos_higher, labels=labels, font_size=20)
+        nx.draw_networkx_labels(graph, pos_higher, labels=labels, font_size=16)
         cbar = plt.colorbar(network)
-        cbar.ax.tick_params(labelsize=20)
+        cbar.ax.tick_params(labelsize=16)
         plt.axis('off')
         filename = char + 'network' + str(d) + '.png'
         plt.savefig(filename, dpi=300)

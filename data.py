@@ -233,7 +233,7 @@ def draw_network(ndat, n_days, buy_network, sell_network, zipfile):
             a = graph.node[node]['alpha']
             labels[node] = [t, a]
 
-        plt.figure(figsize=(12, 12))
+        plt.figure(figsize=(12, 9))
         pos = nx.circular_layout(graph)
         pos_higher = {}
         for k, v in pos.items():

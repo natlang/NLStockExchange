@@ -161,7 +161,7 @@ class DayData:
                 sum_sqrd = sum(map(lambda x: (x - eq) ** 2, arr))
                 a = (1.0 / eq) * math.sqrt((1.0 / num) * sum_sqrd)
             else:
-                a = 1.0  # TODO: change this to a more reasonable value
+                a = 0.0  # TODO: change this to a more reasonable value
             return a
 
         # For each trader, calc Smith's alpha using price history and teq as equilibrium
@@ -211,9 +211,9 @@ def init_ndat(traders_spec, n_days):
     ndat = {}
     for n in range(n_traders):
         bname = 'B%02d' % n
-        ndat[bname] = np.ones(n_days)
+        ndat[bname] = np.zeros(n_days)
         sname = 'S%02d' % n
-        ndat[sname] = np.ones(n_days)
+        ndat[sname] = np.zeros(n_days)
 
     return ndat
 
@@ -233,7 +233,7 @@ def draw_network(ndat, n_days, buy_network, sell_network, zipfile):
             a = graph.node[node]['alpha']
             labels[node] = [t, a]
 
-        plt.figure(figsize=(12, 9))
+        plt.figure(figsize=(15, 12))
         pos = nx.circular_layout(graph)
         pos_higher = {}
         for k, v in pos.items():

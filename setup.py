@@ -14,7 +14,7 @@ def build_network(traders_spec, network_type):
     if network_type == 'FC':
         buyers_network = nx.complete_graph(n_traders)
     elif network_type == 'Random':
-        buyers_network = nx.fast_gnp_random_graph(n_traders, 0.4)
+        buyers_network = nx.fast_gnp_random_graph(n_traders, 0.1)
     elif network_type == 'SW':
         buyers_network = nx.watts_strogatz_graph(n_traders, 6, 0.6)
     elif network_type == 'SF':

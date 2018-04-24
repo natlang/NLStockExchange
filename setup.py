@@ -18,7 +18,7 @@ def build_network(traders_spec, network):
     elif network[0] == 'SW':
         buyers_network = nx.watts_strogatz_graph(n_traders, network[2], network[1])
     elif network[0] == 'SF':
-        buyers_network = nx.barabasi_albert_graph(n_traders, network[1])
+        buyers_network = nx.barabasi_albert_graph(n_traders, network[2])
     else:
         sys.exit('FATAL: don\'t know robot type %s\n' % network)
 

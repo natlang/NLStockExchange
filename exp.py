@@ -2,7 +2,6 @@ import os
 import sys
 import zipfile
 
-import networkx as nx
 import pandas as pd
 from time import gmtime, strftime
 import logging

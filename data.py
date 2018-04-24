@@ -225,9 +225,10 @@ def draw_network(ndat, n_days, buy_network, sell_network, zipfile):
         colors = [graph.node[x]['alpha'] for x in graph.nodes()]
         labels = {}
         for node in graph.nodes:
-            t = graph.node[node]['tname']
-            a = graph.node[node]['alpha']
-            labels[node] = t + '\n' + str(a)
+            # t = graph.node[node]['tname']
+            # a = graph.node[node]['alpha']
+            # labels[node] = t + '\n' + str(a)
+            labels[node] = str(graph.node[node]['alpha'])
 
         plt.figure(figsize=(12,9))
         pos = nx.circular_layout(graph, center=(0, 0))
@@ -235,7 +236,7 @@ def draw_network(ndat, n_days, buy_network, sell_network, zipfile):
         for k, v in pos.items():
             pos_higher[k] = (v[0], v[1] + 0.075)
         nx.draw_networkx_edges(graph, pos, alpha=0.2)
-        network = nx.draw_networkx_nodes(graph, pos, node_color=colors, cmap=plt.cm.RdYlGn_r, vmin=0.0, vmax=0.75)
+        network = nx.draw_networkx_nodes(graph, pos, node_color=colors, cmap=plt.cm.gist_rainbow_r, vmin=0.0, vmax=0.75)
         nx.draw_networkx_labels(graph, pos_higher, labels=labels, font_size=16)
         cbar = plt.colorbar(network)
         cbar.ax.tick_params(labelsize=16)

@@ -35,7 +35,7 @@ if __name__ == '__main__':
 
     # Initialise network
     logger.info('Creating network')
-    (n_traders, buy_network, sell_network) = setup.build_network(params['traders_spec'], params['network_type'])
+    (n_traders, buy_network, sell_network) = setup.build_network(params['traders_spec'], params['network'])
     data.write_adj_matrix(zip_file, buy_network)
     ndat = data.init_ndat(params['traders_spec'], params['n_days'])
 

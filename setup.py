@@ -7,20 +7,20 @@ from agentZIC import AgentZIC
 
 
 # Build graph of traders, identical graphs for seller and buyer communities
-def build_network(traders_spec, network_type):
+def build_network(traders_spec, network):
     # n_traders equal to number of each trader type (buyers OR sellers), half of total number of traders
     n_traders = sum(n for _, n in traders_spec)
 
-    if network_type == 'FC':
+    if network[0] == 'FC':
         buyers_network = nx.complete_graph(n_traders)
-    elif network_type == 'Random':
-        buyers_network = nx.fast_gnp_random_graph(n_traders, 0.1)
-    elif network_type == 'SW':
-        buyers_network = nx.watts_strogatz_graph(n_traders, 6, 0.6)
-    elif network_type == 'SF':
-        buyers_network = nx.barabasi_albert_graph(n_traders, 4)
+    elif network[0] == 'Random':
+        buyers_network = nx.fast_gnp_random_graph(n_traders, network[1])
+    elif network[0] == 'SW':
+        buyers_network = nx.watts_strogatz_graph(n_traders, network[2], network[1])
+    elif network[0] == 'SF':
+        buyers_network = nx.barabasi_albert_graph(n_traders, network[1])
     else:
-        sys.exit('FATAL: don\'t know robot type %s\n' % network_type)
+        sys.exit('FATAL: don\'t know robot type %s\n' % network)
 
     sellers_network = buyers_network.copy()
     return n_traders, buyers_network, sellers_network

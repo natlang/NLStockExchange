@@ -5,6 +5,8 @@ def get_params(filename):
     n_trials = 0
     traders_spec = []
     network_type = None
+    p = 0
+    k = 0
     days = None
     order_schedule = {}
     demand_schedule = []
@@ -34,6 +36,13 @@ def get_params(filename):
                     traders_spec.append((ttype, num))
             elif line.startswith('#network'):
                 network_type = lines[i + 1].strip('\n')
+                if network_type == 'Random':
+                    p = float(lines[i+2])
+                elif network_type == 'SW':
+                    p = float(lines[i+2])
+                    k = int(lines[i+3])
+                elif network_type == 'SF':
+                    k = int(lines[i+2])
             elif line.startswith('#order_interval'):
                 interval = float(lines[i + 1])
                 order_schedule['interval'] = interval
@@ -57,7 +66,7 @@ def get_params(filename):
         order_schedule['sup'] = supply_schedule
 
     params = {'n_trials': n_trials,
-              'network_type': network_type,
+              'network': [network_type, p, k],
               'n_days': days,
               'start': start_time,
               'end': end_time,

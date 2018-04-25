@@ -242,14 +242,14 @@ def draw_network(ndat, n_days, buy_network, sell_network, zipfile):
             a = graph.node[node]['alpha']
             deg = d_dict[node]
             # labels[node] = t + '\n' + str(a)
-            labels[node] = str(a) + '\n\n' + str(deg)
+            labels[node] = str(a) + '\n' + str(deg)
             # labels[node] = str(graph.node[node]['alpha'])
 
         plt.figure(figsize=(12,9))
         pos = nx.circular_layout(graph, center=(0, 0))
         pos_higher = {}
         for k, v in pos.items():
-            pos_higher[k] = (v[0], v[1] + 0.08)
+            pos_higher[k] = (v[0], v[1] + 0.06)
         nx.draw_networkx_edges(graph, pos, alpha=0.2)
         network = nx.draw_networkx_nodes(graph, pos, node_size=sizes, node_color=colors, cmap=plt.cm.gist_rainbow_r, vmin=0.0, vmax=0.75)
         nx.draw_networkx_labels(graph, pos_higher, labels=labels, font_size=12)

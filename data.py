@@ -242,7 +242,7 @@ def draw_network(ndat, n_days, buy_network, sell_network, zipfile):
             a = graph.node[node]['alpha']
             deg = d_dict[node]
             # labels[node] = t + '\n' + str(a)
-            labels[node] = str(a) + '\n' + str(deg)
+            labels[node] = str(a) + '\n\n' + str(deg)
             # labels[node] = str(graph.node[node]['alpha'])
 
         plt.figure(figsize=(12,9))

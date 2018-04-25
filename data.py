@@ -161,7 +161,7 @@ class DayData:
                 sum_sqrd = sum(map(lambda x: (x - eq) ** 2, arr))
                 a = (1.0 / eq) * math.sqrt((1.0 / num) * sum_sqrd)
             else:
-                a = 0.0  # TODO: change this to a more reasonable value
+                a = 0.0
             return a
 
         # For each trader, calc Smith's alpha using price history and teq as equilibrium
@@ -218,6 +218,17 @@ def update_ndat(ndat, tname, trial, current_day, alpha):
     old_mean = ndat[tname][current_day]
     new_mean = (((trial - 1) * old_mean) + alpha) / trial
     ndat[tname][current_day] = new_mean
+
+
+def get_ndat_df(ndat, graph):
+    for tname in ndat.keys():
+        nodeid = int(tname[-2:])
+        ndat[tname] = np.append(ndat[tname], int(graph.degree(nodeid)))
+
+    df = pd.DataFrame.from_dict(ndat, orient='index')
+    size = df.columns.size
+    df.rename(columns={size - 1: 'degree'}, inplace=True)
+    return df
 
 
 def draw_network(ndat, n_days, buy_network, sell_network, zipfile):

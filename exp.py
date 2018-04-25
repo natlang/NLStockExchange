@@ -54,6 +54,7 @@ if __name__ == '__main__':
         # Add trading and day data from trial to df
         ddat_df = ddat_df.append(ddat)
         tdat_df = tdat_df.append(tdat)
+        ndat_df = data.get_ndat_df(ndat, buy_network)
         trial += 1
 
     logger.info('Experiments finished')
@@ -63,6 +64,8 @@ if __name__ == '__main__':
     zip_file.writestr(filename + '_ddat.csv', ddat_df.to_csv(index=False))
     logger.info('Writing trading data to csv...')
     zip_file.writestr(filename + '_tdat.csv', tdat_df.to_csv(index=False))
+    logger.info('Writing network data to csv...')
+    zip_file.writestr(filename + '_ndat.csv', ndat_df.to_csv(index=False))
     # Draw network graphs and write to zipfile
     logger.info('Drawing network graphs...')
     data.draw_network(ndat, params['n_days'], buy_network, sell_network, zip_file)

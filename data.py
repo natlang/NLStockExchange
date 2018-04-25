@@ -223,23 +223,27 @@ def update_ndat(ndat, tname, trial, current_day, alpha):
 def draw_network(ndat, n_days, buy_network, sell_network, zipfile):
     def draw_graph(graph, d, char, zip_file):
         colors = [graph.node[x]['alpha'] for x in graph.nodes()]
+        d_dict = dict(nx.degree(graph))
+        sizes = [v * 70 for v in d_dict.values()]
         labels = {}
         for node in graph.nodes:
-            # t = graph.node[node]['tname']
-            # a = graph.node[node]['alpha']
+            t = graph.node[node]['tname']
+            a = graph.node[node]['alpha']
+            deg = d_dict[node]
             # labels[node] = t + '\n' + str(a)
-            labels[node] = str(graph.node[node]['alpha'])
+            labels[node] = str(a) + '\n\n' + str(deg)
+            # labels[node] = str(graph.node[node]['alpha'])
 
         plt.figure(figsize=(12,9))
         pos = nx.circular_layout(graph, center=(0, 0))
         pos_higher = {}
         for k, v in pos.items():
-            pos_higher[k] = (v[0], v[1] + 0.075)
+            pos_higher[k] = (v[0], v[1] + 0.08)
         nx.draw_networkx_edges(graph, pos, alpha=0.2)
-        network = nx.draw_networkx_nodes(graph, pos, node_color=colors, cmap=plt.cm.gist_rainbow_r, vmin=0.0, vmax=0.75)
-        nx.draw_networkx_labels(graph, pos_higher, labels=labels, font_size=16)
-        cbar = plt.colorbar(network)
-        cbar.ax.tick_params(labelsize=16)
+        network = nx.draw_networkx_nodes(graph, pos, node_size=sizes, node_color=colors, cmap=plt.cm.gist_rainbow_r, vmin=0.0, vmax=0.75)
+        nx.draw_networkx_labels(graph, pos_higher, labels=labels, font_size=12)
+        # cbar = plt.colorbar(network)
+        # cbar.ax.tick_params(labelsize=18)
         plt.axis('off')
         filename = char + 'network' + str(d) + '.png'
         plt.savefig(filename, dpi=300)

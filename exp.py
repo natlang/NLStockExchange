@@ -2,8 +2,6 @@ import os
 import sys
 import zipfile
 import pandas as pd
-import time
-from time import gmtime, strftime
 import logging
 
 import setup
@@ -18,11 +16,8 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 if __name__ == '__main__':
-    start = time.time()
-
     input_file = sys.argv[1]
     filename, file_ext = os.path.splitext(os.path.basename(input_file))
-    # strtime = str(strftime('%d-%b_%H:%M', gmtime()))
 
     zip_name = filename + '.zip'
     zip_file = zipfile.ZipFile(zip_name, 'w')
@@ -73,8 +68,5 @@ if __name__ == '__main__':
     data.draw_network(ndat, params['n_days'], buy_network, sell_network, zip_file)
 
     zip_file.close()
-
-    end = time.time()
-    print(end - start)
     sys.exit('Complete')
 

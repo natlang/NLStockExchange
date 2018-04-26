@@ -225,9 +225,9 @@ def get_ndat_df(ndat, graph):
         nodeid = int(tname[-2:])
         ndat[tname] = np.append(ndat[tname], int(graph.degree(nodeid)))
 
-    df = pd.DataFrame.from_dict(ndat, orient='index')
+    df = pd.DataFrame.from_dict(ndat, orient='index').reset_index()
     size = df.columns.size
-    df.rename(columns={size - 1: 'degree'}, inplace=True)
+    df.rename(columns={'index': 'tname', size - 1: 'degree'}, inplace=True)
     return df
 
 
@@ -251,7 +251,7 @@ def draw_network(ndat, n_days, buy_network, sell_network, zipfile):
         for k, v in pos.items():
             pos_higher[k] = (v[0], v[1] + 0.06)
         nx.draw_networkx_edges(graph, pos, alpha=0.2)
-        network = nx.draw_networkx_nodes(graph, pos, node_size=sizes, node_color=colors, cmap=plt.cm.gist_rainbow_r, vmin=0.0, vmax=0.75)
+        network = nx.draw_networkx_nodes(graph, pos, node_size=sizes, node_color=colors, alpha=0.8, cmap=plt.cm.gist_rainbow_r, vmin=0.0, vmax=0.75)
         nx.draw_networkx_labels(graph, pos_higher, labels=labels, font_size=12)
         # cbar = plt.colorbar(network)
         # cbar.ax.tick_params(labelsize=18)

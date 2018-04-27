@@ -87,9 +87,9 @@ class AgentZIP:
 
         transactionprice = trade['price']
         if self.job == 'Buy':
-            profit = self.order.price - transactionprice
+            profit = self.limit - transactionprice
         else:
-            profit = transactionprice - self.order.price
+            profit = transactionprice - self.limit
 
         if profit < 0.0:
             profit = 0.0

@@ -92,28 +92,13 @@ def find_eq(traders, n_traders):
 
 # Initialise trading data df
 def init_tdat():
-    df = pd.DataFrame(columns=['trialID', 'time', 'TEQ_P', 'TEQ_Q', 'AEQ_P', 'AEQ_Q', 'Transaction', 'Profit_Diff1', 'Profit_Diff2'])
+    df = pd.DataFrame(columns=['trialID', 'time', 'TEQ_P', 'TEQ_Q', 'AEQ_P', 'AEQ_Q', 'Transaction', 'Profit_Diff'])
     return df
 
 
 # Update trading df with data (equilibrium prices + quantities, transaction price)
-def update_tdat(tdat_df, trial, time, traders, eq, trade):
-    # Calculte difference between realised profit and theoretical max profit for each counterparty to the trade
-    def profit_diff(tname, transaction, teq):
-        price = traders[tname].price
-        if traders[tname].job == 'Buy':
-            rel_profit = price - transaction
-            max_profit = price - teq
-        else:
-            rel_profit = transaction - price
-            max_profit = teq - price
-
-        diff = abs(rel_profit - max_profit)
-        return diff
-
-    transaction = trade['price']
-    diff1 = profit_diff(trade['party1'], transaction, eq[0])
-    diff2 = profit_diff(trade['party2'], transaction, eq[0])
+def update_tdat(tdat_df, trial, time, eq, trade):
+    diff = abs(trade - eq[0])
 
     tdat = {'trialID': trial,
             'time': time,
@@ -121,9 +106,8 @@ def update_tdat(tdat_df, trial, time, traders, eq, trade):
             'TEQ_Q': eq[1],
             'AEQ_P': eq[2],
             'AEQ_Q': eq[3],
-            'Transaction': transaction,
-            'Profit_Diff1': diff1,
-            'Profit_Diff2': diff2}
+            'Transaction': trade,
+            'Profit_Diff': diff}
     tdat_df = tdat_df.append(tdat, ignore_index=True)
     return tdat_df
 

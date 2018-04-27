@@ -256,9 +256,8 @@ def run(trial, start_time, end_time, order_sched, traders, n_traders, ndat, buy_
                 traders[trade['party1']].bookkeep(trade, bookkeep_verbose)
                 traders[trade['party2']].bookkeep(trade, bookkeep_verbose)
                 trade_price = trade['price']
-                tdat = data.update_tdat(tdat, trial, time, traders, eq, trade)
+                tdat = data.update_tdat(tdat, trial, time, eq, trade_price)
             update_traders(order, traders, n_traders, buy_network, sell_network, update_verbose)
-
             ddat.update_ddat(trial, time, traders, n_traders, eq, trade_price, ndat)
         time += timestep
 

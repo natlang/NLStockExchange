@@ -92,19 +92,38 @@ def find_eq(traders, n_traders):
 
 # Initialise trading data df
 def init_tdat():
-    df = pd.DataFrame(columns=['trialID', 'time', 'TEQ_P', 'TEQ_Q', 'AEQ_P', 'AEQ_Q', 'Transaction'])
+    df = pd.DataFrame(columns=['trialID', 'time', 'TEQ_P', 'TEQ_Q', 'AEQ_P', 'AEQ_Q', 'Transaction', 'Profit_Diff1', 'Profit_Diff2'])
     return df
 
 
 # Update trading df with data (equilibrium prices + quantities, transaction price)
-def update_tdat(tdat_df, trial, time, eq, trade):
+def update_tdat(tdat_df, trial, time, traders, eq, trade):
+    # Calculte difference between realised profit and theoretical max profit for each counterparty to the trade
+    def profit_diff(tname, transaction, teq):
+        price = traders[tname].price
+        if traders[tname].job == 'Buy':
+            rel_profit = price - transaction
+            max_profit = price - teq
+        else:
+            rel_profit = transaction - price
+            max_profit = teq - price
+
+        diff = abs(rel_profit - max_profit)
+        return diff
+
+    transaction = trade['price']
+    diff1 = profit_diff(trade['party1'], transaction, eq[0])
+    diff2 = profit_diff(trade['party2'], transaction, eq[0])
+
     tdat = {'trialID': trial,
             'time': time,
             'TEQ_P': eq[0],
             'TEQ_Q': eq[1],
             'AEQ_P': eq[2],
             'AEQ_Q': eq[3],
-            'Transaction': trade}
+            'Transaction': transaction,
+            'Profit_Diff1': diff1,
+            'Profit_Diff2': diff2}
     tdat_df = tdat_df.append(tdat, ignore_index=True)
     return tdat_df
 
@@ -128,6 +147,7 @@ class DayData:
         self.aeq_p = None
         self.transaction = None
 
+    # Update day data with equilibrium prices and transactions
     def update_ddat(self, trial, time, traders, n_traders, eq, trade, ndat):
         def update_arr(arr, value):
             if not np.isnan(value):
@@ -148,6 +168,7 @@ class DayData:
         self.aeq_p = update_arr(self.aeq_p, eq[2])
         self.transaction = update_arr(self.transaction, trade)
 
+    # End-of-day calulcations, update df
     def end_day(self, trial, traders, n_traders, ndat, next_day):
         def calc_mean(arr):
             mean = np.nan
@@ -205,11 +226,13 @@ class DayData:
 
         self.current_day = next_day
 
+    # Start-of-day initialisations
     def init_day(self):
         self.teq_p = None
         self.aeq_p = None
         self.transaction = None
 
+    # Return day data df
     def get_df(self):
         return self.df
 
@@ -234,13 +257,18 @@ def init_ndat(traders_spec, n_days):
     return ndat
 
 
-def update_ndat(ndat, tname, trial, current_day, alpha, best_alpha):
-    old_mean = ndat['alpha'][tname][current_day]
-    new_mean = (((trial - 1) * old_mean) + alpha) / trial
-    ndat['alpha'][tname][current_day] = new_mean
-    ndat['best'][tname][current_day] = best_alpha
+# Update mean daily value of alpha and best for each trader
+def update_ndat(ndat, tname, trial, current_day, alpha, best):
+    old_alpha = ndat['alpha'][tname][current_day]
+    new_alpha = (((trial - 1) * old_alpha) + alpha) / trial
+    ndat['alpha'][tname][current_day] = new_alpha
+
+    old_best = ndat['best'][tname][current_day]
+    new_best = (((trial - 1) * old_best) + best) / trial
+    ndat['best'][tname][current_day] = new_best
 
 
+# Update and return network data df
 def get_ndat_df(ndat, n_days, graph):
     df_alpha = pd.DataFrame.from_dict(ndat['alpha'], orient='index').reset_index()
     df_best = pd.DataFrame.from_dict(ndat['best'], orient='index').reset_index()
@@ -253,6 +281,7 @@ def get_ndat_df(ndat, n_days, graph):
     return df
 
 
+# Draw network images
 def draw_network(ndat, n_days, buy_network, sell_network, zipfile):
     def find_values(a, b):
         d = abs(a - b)

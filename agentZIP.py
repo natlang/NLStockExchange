@@ -61,7 +61,6 @@ class AgentZIP:
     # Add price to price_hist
     def update_price_hist(self):
         if self.price is not None:
-            self.price_hist.append(self.price)
             if self.price_hist:
                 prev_price = self.price_hist[-1]
                 if self.price != prev_price:

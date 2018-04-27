@@ -162,7 +162,7 @@ class DayData:
                 sum_sqrd = sum(map(lambda x: (x - eq) ** 2, arr))
                 a = (1.0 / eq) * math.sqrt((1.0 / num) * sum_sqrd)
             else:
-                a = 0.0
+                a = np.nan
             return a
 
         # Calculate best possible alpha value
@@ -175,7 +175,7 @@ class DayData:
                 else:
                     a = 0.0
             else:
-                a = 1.0
+                a = np.nan
             return a
 
         # For each trader, calc Smith's alpha using price history and teq as equilibrium
@@ -254,18 +254,20 @@ def get_ndat_df(ndat, n_days, graph):
 
 
 def draw_network(ndat, n_days, buy_network, sell_network, zipfile):
+    def find_values(a, b):
+        d = abs(a - b)
+        new_a = a
+        if np.isnan(new_a):
+            new_a = 1.0
+        return d, new_a
+
     def draw_graph(graph, d, char, zip_file):
         colors = [graph.node[x]['alpha'] for x in graph.nodes()]
         d_dict = dict(nx.degree(graph))
         sizes = [v * 70 for v in d_dict.values()]
         labels = {}
         for node in graph.nodes:
-            a = graph.node[node]['alpha']
-            b = graph.node[node]['best']
-            deg = d_dict[node]
-            # labels[node] = t + '\n' + str(a)
-            labels[node] = str(a) + '-' + str(b) + '\n\n' + str(deg)
-            # labels[node] = str(graph.node[node]['alpha'])
+            labels[node] = str(graph.node[node]['diff']) + '\n\n' + str(d_dict[node])
 
         plt.figure(figsize=(12,9))
         pos = nx.circular_layout(graph, center=(0, 0))
@@ -288,12 +290,13 @@ def draw_network(ndat, n_days, buy_network, sell_network, zipfile):
     for n in range(n_days):
         for tname in ndat['alpha'].keys():
             nodeid = int(tname[-2:])
+            diff, alpha = find_values(ndat['alpha'][tname][n], ndat['best'][tname][n])
             if tname[:1] == 'B':
-                buy_network.node[nodeid]['alpha'] = float("{0:.3f}".format(ndat['alpha'][tname][n]))
-                buy_network.node[nodeid]['best'] = float("{0:.3f}".format(ndat['best'][tname][n]))
+                buy_network.node[nodeid]['diff'] = float("{0:.3f}".format(diff))
+                buy_network.node[nodeid]['alpha'] = float("{0:.3f}".format(alpha))
             elif tname[:1] == 'S':
-                sell_network.node[nodeid]['alpha'] = float("{0:.3f}".format(ndat['alpha'][tname][n]))
-                sell_network.node[nodeid]['best'] = float("{0:.3f}".format(ndat['best'][tname][n]))
+                sell_network.node[nodeid]['diff'] = float("{0:.3f}".format(diff))
+                sell_network.node[nodeid]['alpha'] = float("{0:.3f}".format(alpha))
             else:
                 sys.exit('FATAL tname %s is not in correct format.' % tname)
 

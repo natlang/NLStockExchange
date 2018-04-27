@@ -243,9 +243,9 @@ def run(trial, start_time, end_time, order_sched, traders, n_traders, ndat, buy_
 
     while time <= end_time:
         trade_price = np.nan
-        eq = data.find_eq(traders, n_traders)
 
         pending_orders = customer_orders(time, traders, n_traders, order_sched, pending_orders, orders_verbose)
+        eq = data.find_eq(traders, n_traders)
 
         # Get shout (order) from randomly chosen trader
         tid = random.choice(list(traders.keys()))

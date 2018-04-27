@@ -155,6 +155,7 @@ class DayData:
                 mean = np.mean(arr)
             return mean
 
+        # Calculate Smith's alpha based on price history
         def calc_alpha(eq, arr):
             if arr:
                 num = len(arr)
@@ -164,18 +165,33 @@ class DayData:
                 a = 0.0
             return a
 
+        # Calculate best possible alpha value
+        def calc_best_alpha(eq, limit, job):
+            if limit:
+                if job == 'Buy' and limit < teq:
+                    a = (1.0 / teq) * abs(limit - eq)
+                elif job == 'Sell' and limit > teq:
+                    a = (1.0 / teq) * abs(limit - eq)
+                else:
+                    a = 0.0
+            else:
+                a = 1.0
+            return a
+
         # For each trader, calc Smith's alpha using price history and teq as equilibrium
         teq = calc_mean(self.teq_p)
         aeq = calc_mean(self.aeq_p)
         for n in range(n_traders):
             bname = 'B%02d' % n
             alpha = calc_alpha(teq, traders[bname].price_hist)
-            update_ndat(ndat, bname, trial, self.current_day, alpha)
+            best_alpha = calc_best_alpha(teq, traders[bname].limit, 'Buy')
+            update_ndat(ndat, bname, trial, self.current_day, alpha, best_alpha)
             traders[bname].reset_price_hist()
 
             sname = 'S%02d' % n
             alpha = calc_alpha(teq, traders[sname].price_hist)
-            update_ndat(ndat, sname, trial, self.current_day, alpha)
+            best_alpha = calc_best_alpha(teq, traders[sname].limit, 'Sell')
+            update_ndat(ndat, sname, trial, self.current_day, alpha, best_alpha)
             traders[sname].reset_price_hist()
 
         # Write previous days data to structure containing data for *all* days in trial
@@ -204,30 +220,36 @@ class DayData:
 # Initialise network data classes
 def init_ndat(traders_spec, n_days):
     n_traders = sum(n for _, n in traders_spec)
-    ndat = {}
+    ndat_alpha = {}
+    ndat_best = {}
     for n in range(n_traders):
         bname = 'B%02d' % n
-        ndat[bname] = np.zeros(n_days)
+        ndat_alpha[bname] = np.zeros(n_days)
+        ndat_best[bname] = np.ones(n_days)
         sname = 'S%02d' % n
-        ndat[sname] = np.zeros(n_days)
+        ndat_alpha[sname] = np.zeros(n_days)
+        ndat_best[sname] = np.ones(n_days)
+    ndat = {'alpha': ndat_alpha, 'best': ndat_best}
 
     return ndat
 
 
-def update_ndat(ndat, tname, trial, current_day, alpha):
-    old_mean = ndat[tname][current_day]
+def update_ndat(ndat, tname, trial, current_day, alpha, best_alpha):
+    old_mean = ndat['alpha'][tname][current_day]
     new_mean = (((trial - 1) * old_mean) + alpha) / trial
-    ndat[tname][current_day] = new_mean
+    ndat['alpha'][tname][current_day] = new_mean
+    ndat['best'][tname][current_day] = best_alpha
 
 
-def get_ndat_df(ndat, graph):
-    for tname in ndat.keys():
-        nodeid = int(tname[-2:])
-        ndat[tname] = np.append(ndat[tname], int(graph.degree(nodeid)))
+def get_ndat_df(ndat, n_days, graph):
+    df_alpha = pd.DataFrame.from_dict(ndat['alpha'], orient='index').reset_index()
+    df_best = pd.DataFrame.from_dict(ndat['best'], orient='index').reset_index()
+    df = pd.merge(df_alpha, df_best, on='index')
 
-    df = pd.DataFrame.from_dict(ndat, orient='index').reset_index()
-    size = df.columns.size
-    df.rename(columns={'index': 'tname', size - 1: 'degree'}, inplace=True)
+    df.rename(columns={'index': 'tname'}, inplace=True)
+    df.rename(columns=lambda x: x.replace('x', 'alpha'), inplace=True)
+    df.rename(columns=lambda x: x.replace('y', 'best'), inplace=True)
+
     return df
 
 
@@ -238,11 +260,11 @@ def draw_network(ndat, n_days, buy_network, sell_network, zipfile):
         sizes = [v * 70 for v in d_dict.values()]
         labels = {}
         for node in graph.nodes:
-            t = graph.node[node]['tname']
             a = graph.node[node]['alpha']
+            b = graph.node[node]['best']
             deg = d_dict[node]
             # labels[node] = t + '\n' + str(a)
-            labels[node] = str(a) + '\n\n' + str(deg)
+            labels[node] = str(a) + '-' + str(b) + '\n\n' + str(deg)
             # labels[node] = str(graph.node[node]['alpha'])
 
         plt.figure(figsize=(12,9))
@@ -264,12 +286,14 @@ def draw_network(ndat, n_days, buy_network, sell_network, zipfile):
         plt.close('all')
 
     for n in range(n_days):
-        for tname, day in ndat.items():
+        for tname in ndat['alpha'].keys():
             nodeid = int(tname[-2:])
             if tname[:1] == 'B':
-                buy_network.node[nodeid]['alpha'] = float("{0:.3f}".format(day[n]))
+                buy_network.node[nodeid]['alpha'] = float("{0:.3f}".format(ndat['alpha'][tname][n]))
+                buy_network.node[nodeid]['best'] = float("{0:.3f}".format(ndat['best'][tname][n]))
             elif tname[:1] == 'S':
-                sell_network.node[nodeid]['alpha'] = float("{0:.3f}".format(day[n]))
+                sell_network.node[nodeid]['alpha'] = float("{0:.3f}".format(ndat['alpha'][tname][n]))
+                sell_network.node[nodeid]['best'] = float("{0:.3f}".format(ndat['best'][tname][n]))
             else:
                 sys.exit('FATAL tname %s is not in correct format.' % tname)
 

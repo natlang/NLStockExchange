@@ -49,7 +49,8 @@ def populate_market(traders_spec, traders, buyers_network, sellers_network, verb
             tname = 'B%02d' % n_buyers  # Set buyer ID string
             traders[tname] = initialise_agent(ttype, tname, n_buyers, 'Buy')
             buyers_network.node[n_buyers]['tname'] = tname
-            buyers_network.node[n_buyers]['alpha'] = 0
+            buyers_network.node[n_buyers]['alpha'] = 0.0
+            buyers_network.node[n_buyers]['best'] = 1.0
             n_buyers += 1
 
     if n_buyers < 1:
@@ -68,7 +69,8 @@ def populate_market(traders_spec, traders, buyers_network, sellers_network, verb
             tname = 'S%02d' % n_sellers  # Set seller ID string
             traders[tname] = initialise_agent(ttype, tname, n_sellers, 'Sell')
             sellers_network.node[n_sellers]['tname'] = tname
-            sellers_network.node[n_sellers]['alpha'] = 0
+            sellers_network.node[n_sellers]['alpha'] = 0.0
+            sellers_network.node[n_sellers]['best'] = 1.0
             n_sellers += 1
 
     if n_sellers < 1:

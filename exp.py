@@ -51,7 +51,7 @@ if __name__ == '__main__':
         # Add trading and day data from trial to df
         ddat_df = ddat_df.append(ddat)
         tdat_df = tdat_df.append(tdat)
-        ndat_df = data.get_ndat_df(ndat, buy_network)
+        ndat_df = data.get_ndat_df(ndat, params['n_days'], buy_network)
         trial += 1
 
     logger.info('Experiments finished')

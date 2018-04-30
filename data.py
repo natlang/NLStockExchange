@@ -294,7 +294,7 @@ def draw_network(ndat, n_days, buy_network, sell_network, zipfile):
         # cbar.ax.tick_params(labelsize=18)
         plt.axis('off')
         filename = char + 'network' + str(d) + '.png'
-        plt.savefig(filename, dpi=300)
+        plt.savefig(filename, dpi=300, bbox_inches='tight')
         zip_file.write(filename)
         os.remove(filename)
         plt.clf()

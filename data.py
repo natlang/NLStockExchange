@@ -283,7 +283,7 @@ def draw_network(ndat, n_days, buy_network, sell_network, zipfile):
             labels[node] = str(graph.node[node]['diff']) + '\n' + str(d_dict[node])
 
         plt.figure(figsize=(12,9))
-        pos = nx.circular_layout(graph, center=(0, 0))
+        pos = nx.circular_layout(graph, center=(0, -10))
         pos_higher = {}
         for k, v in pos.items():
             pos_higher[k] = (v[0], v[1] + 0.06)

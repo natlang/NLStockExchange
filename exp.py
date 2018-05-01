@@ -58,11 +58,11 @@ if __name__ == '__main__':
 
     # Write dataframes to csv and to zipfile
     logger.info('Writing day data to csv...')
-    zip_file.writestr(filename + '_ddat.csv', ddat_df.to_csv(index=False))
+    zip_file.writestr('ddat.csv', ddat_df.to_csv(index=False))
     logger.info('Writing trading data to csv...')
-    zip_file.writestr(filename + '_tdat.csv', tdat_df.to_csv(index=False))
+    zip_file.writestr('tdat.csv', tdat_df.to_csv(index=False))
     logger.info('Writing network data to csv...')
-    zip_file.writestr(filename + '_ndat.csv', ndat_df.to_csv(index=False))
+    zip_file.writestr('ndat.csv', ndat_df.to_csv(index=False))
     # Draw network graphs and write to zipfile
     logger.info('Drawing network graphs...')
     data.draw_network(ndat, params['n_days'], buy_network, sell_network, zip_file)

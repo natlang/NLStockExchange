@@ -277,7 +277,7 @@ def draw_network(ndat, n_days, buy_network, sell_network, zipfile):
     def draw_graph(graph, d, char, zip_file):
         colors = [graph.node[x]['alpha'] for x in graph.nodes()]
         d_dict = dict(nx.degree(graph))
-        sizes = [v * 70 for v in d_dict.values()]
+        sizes = [(v+1) * 70 for v in d_dict.values()]
         labels = {}
         for node in graph.nodes:
             labels[node] = str(graph.node[node]['diff']) + '\n' + str(d_dict[node])

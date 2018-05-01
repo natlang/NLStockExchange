@@ -284,7 +284,7 @@ def draw_network(ndat, n_days, buy_network, sell_network, zipfile):
         pos = nx.circular_layout(graph, center=(0, 0))
         pos_higher = {}
         for k, v in pos.items():
-            pos_higher[k] = (v[0], v[1] + 0.09)
+            pos_higher[k] = (v[0], v[1] + 0.075)
         nx.draw_networkx_edges(graph, pos, alpha=0.2)
         network = nx.draw_networkx_nodes(graph, pos, node_size=sizes, node_color=colors, alpha=0.8, cmap=plt.cm.gist_rainbow_r, vmin=0.0, vmax=0.75)
         nx.draw_networkx_labels(graph, pos=pos, labels=d_dict, font_color='#cccccc', font_size=14)

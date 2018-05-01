@@ -278,18 +278,17 @@ def draw_network(ndat, n_days, buy_network, sell_network, zipfile):
         colors = [graph.node[x]['alpha'] for x in graph.nodes()]
         d_dict = dict(nx.degree(graph))
         sizes = [(v+1) * 70 for v in d_dict.values()]
-        labels = {}
-        for node in graph.nodes:
-            labels[node] = str(graph.node[node]['diff']) + '\n' + str(d_dict[node])
-
+        labels_diff = dict([(x, graph.node[x]['diff']) for x in graph.nodes()])
+        
         plt.figure(figsize=(12,9))
         pos = nx.circular_layout(graph, center=(0, 0))
         pos_higher = {}
         for k, v in pos.items():
-            pos_higher[k] = (v[0], v[1] + 0.05)
+            pos_higher[k] = (v[0], v[1] + 0.1)
         nx.draw_networkx_edges(graph, pos, alpha=0.2)
         network = nx.draw_networkx_nodes(graph, pos, node_size=sizes, node_color=colors, alpha=0.8, cmap=plt.cm.gist_rainbow_r, vmin=0.0, vmax=0.75)
-        nx.draw_networkx_labels(graph, pos_higher, labels=labels, font_size=16)
+        nx.draw_networkx_labels(graph, pos=pos, labels=d_dict, font_color='#cccccc', font_size=16)
+        nx.draw_networkx_labels(graph, pos=pos_higher, labels=labels_diff, font_size=16)
         # cbar = plt.colorbar(network)
         # cbar.ax.tick_params(labelsize=18)
         plt.axis('off')

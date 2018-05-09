@@ -289,8 +289,8 @@ def draw_network(ndat, n_days, buy_network, sell_network, zipfile):
         network = nx.draw_networkx_nodes(graph, pos, node_size=sizes, node_color=colors, alpha=0.8, cmap=plt.cm.gist_rainbow_r, vmin=0.0, vmax=0.75)
         nx.draw_networkx_labels(graph, pos=pos, labels=d_dict, font_color='#cccccc', font_size=14)
         nx.draw_networkx_labels(graph, pos=pos_higher, labels=labels_diff, font_size=16)
-        # cbar = plt.colorbar(network)
-        # cbar.ax.tick_params(labelsize=18)
+        cbar = plt.colorbar(network)
+        cbar.ax.tick_params(labelsize=18)
         plt.axis('off')
         filename = char + 'network' + str(d) + '.png'
         plt.savefig(filename, dpi=300, bbox_inches='tight')

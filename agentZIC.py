@@ -17,7 +17,7 @@ class AgentZIC:
         self.limit = None
         self.price = None
         self.balance = 0.0
-        self.price_hist = None
+        self.price_hist =[]
 
     def __str__(self):
         return '[TID %s type %s nodeid %s limit %s]' \
@@ -53,6 +53,20 @@ class AgentZIC:
         self.price = quoteprice
         return quoteprice
 
+    # Add price to price_hist
+    def update_price_hist(self):
+        if self.price is not None:
+            if self.price_hist:
+                prev_price = self.price_hist[-1]
+                if self.price != prev_price:
+                    self.price_hist.append(self.price)
+            else:
+                self.price_hist.append(self.price)
+
+    # At end of each day, reset price_hist
+    def reset_price_hist(self):
+        self.price_hist = []
+
     # Is a trader willing to trade at a given price?
     def willing_to_trade(self, oprice):
         willing = False
@@ -64,17 +78,21 @@ class AgentZIC:
         return willing
 
     # Adjust bank balances of agent in deal
-    def bookkeep(self, trade):
+    # Adjust bank balances of agent in deal
+    def bookkeep(self, trade, verbose):
+        outstr = '%s (%s) bookkeeping: order = %s' % (self.tid, self.ttype, self.order)
+
         transactionprice = trade['price']
-        if self.order.otype == 'Bid':
-            profit = self.order.price - transactionprice
+        if self.job == 'Buy':
+            profit = self.limit - transactionprice
         else:
-            profit = transactionprice - self.order.price
+            profit = transactionprice - self.limit
 
         if profit < 0.0:
             profit = 0.0
-
         self.balance += profit
+        if verbose:
+            print('%s profit=%d balance=%d' % (outstr, profit, self.balance))
         self.del_order()
 
     # Update buyer/seller strategy after a order
